@@ -191,6 +191,7 @@
     <Compile Include="Models\OrderItem.cs" />
     <Compile Include="Models\OrderItemShipment.cs" />
     <Compile Include="Models\Shipment.cs" />
+    <Compile Include="Models\SubOrder.cs" />
     <Compile Include="Models\Vendor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
