@@ -16,12 +16,15 @@ namespace Web3.Models
             // Add custom user claims here
             return userIdentity;
         }
+
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext()
-            : base("DefaultConnection", throwIfV1Schema: false)
+            : base("Web3Connection", throwIfV1Schema: false)
         {
         }
 
@@ -29,5 +32,14 @@ namespace Web3.Models
         {
             return new ApplicationDbContext();
         }
+
+        public virtual DbSet<Catalog> AFigures { get; set; }
+        public virtual DbSet<Country> ATable { get; set; }
+        public virtual DbSet<Item> Games { get; set; }
+        public virtual DbSet<Order> Messages { get; set; }
+        public virtual DbSet<OrderItem> Moves { get; set; }
+        public virtual DbSet<OrderItemShipment> Ruless { get; set; }
+        public virtual DbSet<Shipment> Teams { get; set; }
+        public virtual DbSet<Vendor> Stuffs { get; set; }
     }
 }
