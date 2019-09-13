@@ -20,5 +20,9 @@ namespace Web3.Models
         [MaxLength(10)]
         public string Code { get; set; }
 
+        public int? VendorId { get; set; }
+        [ForeignKey("VendorId")]
+        public Vendor Vendor { get; set; }
+
     }
 }

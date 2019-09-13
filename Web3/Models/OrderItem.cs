@@ -21,11 +21,11 @@ namespace Web3.Models
         [MaxLength(200)]
         public string ExtraDiscountDescription { get; set; }
 
-        public int OrderId { get; set; }
-        [ForeignKey("OrderId")]
-        public virtual Order Order { get; set; }
+        public int? SubOrderId { get; set; }
+        [ForeignKey("SubOrderId")]
+        public virtual SubOrder SubOrder { get; set; }
 
-        public int ItemId { get; set; }
+        public int? ItemId { get; set; }
         [ForeignKey("ItemId")]
         public virtual Item Item { get; set; }
 

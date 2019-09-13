@@ -24,15 +24,15 @@ namespace Web3.Models
         [MaxLength(10)]
         public string CategoryCode { get; set; }
 
-        public int CatalogId { get; set; }
+        public int? CatalogId { get; set; }
         [ForeignKey("CatalogId")]
         public virtual Catalog Catalog { get; set; }
 
-        public virtual IList<Order> Orders { get; set; }
+        public virtual IList<SubOrder> SubOrders { get; set; }
 
         public Item()
         {
-            Orders = new List<Order>();
+            SubOrders = new List<SubOrder>();
         }
     }
 }

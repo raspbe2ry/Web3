@@ -15,12 +15,21 @@ namespace Web3.Models
 
         public DateTime ExpectedShipmentDate { get; set; }
 
-        public int VendorId { get; set; }
+        public int? VendorId { get; set; }
         [ForeignKey("VendorId")]
         public virtual Vendor Vendor { get; set; }
 
-        public int OrderId { get; set; }
+        public int? OrderId { get; set; }
         [ForeignKey("OrderId")]
         public virtual Order Order { get; set; }
+
+        public virtual IList<OrderItem> Items { get; set; }
+        public virtual IList<Shipment> Shipments { get; set; }
+
+        public SubOrder()
+        {
+            Items = new List<OrderItem>();
+            Shipments = new List<Shipment>();
+        }
     }
 }

@@ -18,9 +18,12 @@ namespace Web3.Models
         [MaxLength(200)]
         public string Note { get; set; }
 
-        public int UserId { get; set; }
-        [ForeignKey("UsetId")]
+        public int? UserId { get; set; }
+        [ForeignKey("UserId")]
         public virtual ApplicationUser Employee { get; set; }
 
+        public int? SubOrderId { get; set; }
+        [ForeignKey("SubOrderId")]
+        public virtual SubOrder SubOrder { get; set; }
     }
 }

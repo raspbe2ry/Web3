@@ -15,16 +15,14 @@ namespace Web3.Models
 
         public DateTime Date { get; set; }
 
-        public string UserId { get; set; }
+        public int? UserId { get; set; }
         [ForeignKey("UserId")]
         public virtual ApplicationUser Employee { get; set; }
 
-        public virtual IList<OrderItem> Items { get; set; }
         public virtual IList<SubOrder> SubOrders { get; set; }
 
         public Order()
         {
-            Items = new List<OrderItem>();
             SubOrders = new List<SubOrder>();
         }
     }

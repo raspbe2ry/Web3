@@ -34,12 +34,17 @@ namespace Web3.Models
         [MaxLength(20)]
         public string Code { get; set; }
 
-        public int CountryId { get; set; }
+        public int? CountryId { get; set; }
         [ForeignKey("CountryId")]
         public virtual Country Country { get; set; }
 
-        public int OrderId { get; set; }
-        [ForeignKey("OrderId")]
-        public virtual Order Order { get; set; }
+        public virtual IList<SubOrder> SubOrders { get; set; }
+        public virtual IList<Catalog> Catalogs { get; set; }
+
+        public Vendor()
+        {
+            SubOrders = new List<SubOrder>();
+            Catalogs = new List<Catalog>();
+        }
     }
 }
