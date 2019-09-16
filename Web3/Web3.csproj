@@ -52,6 +52,9 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Linq.Dynamic, Version=1.0.6132.35681, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Linq.Dynamic.1.0.7\lib\net40\System.Linq.Dynamic.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -177,11 +180,33 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\CartController.cs" />
+    <Compile Include="Controllers\CatalogController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ItemController.cs" />
     <Compile Include="Controllers\jsTree3Controller.cs" />
+    <Compile Include="Controllers\OrderController.cs" />
+    <Compile Include="Controllers\VendorController.cs" />
+    <Compile Include="DL\CatalogRepository.cs" />
+    <Compile Include="DL\GenericRepository.cs" />
+    <Compile Include="DL\ItemRepository.cs" />
+    <Compile Include="DL\VendorRepository.cs" />
+    <Compile Include="DOL\CartEntity.cs" />
+    <Compile Include="DTO\DTOCatalog.cs" />
+    <Compile Include="DTO\DTOItem.cs" />
+    <Compile Include="DTO\DTOVendor.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="DOL\Cart.cs" />
+    <Compile Include="Helpers\AttributeFilters\KeepTempData.cs" />
+    <Compile Include="Helpers\DataTable\DataResult.cs" />
+    <Compile Include="Helpers\DataTable\DataTableFilter.cs" />
+    <Compile Include="Helpers\Filters\CatalogFilter.cs" />
+    <Compile Include="Helpers\Filters\ItemFilter.cs" />
+    <Compile Include="Helpers\RowClickHandler\ItemClickHandlers.cs" />
+    <Compile Include="Helpers\Select2\Select2OptionModel.cs" />
+    <Compile Include="Helpers\Select2\Select2PagedResult.cs" />
     <Compile Include="Migrations\201909121901387_Initial.cs" />
     <Compile Include="Migrations\201909121901387_Initial.Designer.cs">
       <DependentUpon>201909121901387_Initial.cs</DependentUpon>
@@ -189,6 +214,10 @@
     <Compile Include="Migrations\201909122029358_FirstChange.cs" />
     <Compile Include="Migrations\201909122029358_FirstChange.Designer.cs">
       <DependentUpon>201909122029358_FirstChange.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201909141255313_CodeLenghtItem.cs" />
+    <Compile Include="Migrations\201909141255313_CodeLenghtItem.Designer.cs">
+      <DependentUpon>201909141255313_CodeLenghtItem.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -379,6 +408,8 @@
     <Content Include="Content\DataTables\images\sort_desc.png" />
     <Content Include="Content\DataTables\images\sort_desc_disabled.png" />
     <Content Include="Content\DataTables\swf\flashExport.swf" />
+    <Content Include="Content\font-awesome.css" />
+    <Content Include="Content\font-awesome.min.css" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\jsTree\docs.css" />
     <Content Include="Content\jsTree\themes\default-dark\32px.png" />
@@ -392,6 +423,7 @@
     <Content Include="Content\jsTree\themes\default\style.min.css" />
     <Content Include="Content\jsTree\themes\default\throbber.gif" />
     <Content Include="favicon.ico" />
+    <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -487,6 +519,11 @@
     <Content Include="Content\bootstrap\alerts.less" />
     <Content Include="Content\_bootstrap-datetimepicker.less" />
     <Content Include="Content\bootstrap-datetimepicker-build.less" />
+    <Content Include="fonts\FontAwesome.otf" />
+    <Content Include="fonts\fontawesome-webfont.woff2" />
+    <Content Include="fonts\fontawesome-webfont.woff" />
+    <Content Include="fonts\fontawesome-webfont.ttf" />
+    <Content Include="fonts\fontawesome-webfont.eot" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.min.js" />
@@ -722,6 +759,7 @@
     <Content Include="Scripts\moment-with-locales.min.js" />
     <Content Include="Scripts\moment.js" />
     <Content Include="Scripts\moment.min.js" />
+    <Content Include="Scripts\MyScripts\myScript.js" />
     <Content Include="Scripts\notify.js" />
     <Content Include="Scripts\select2.js" />
     <Content Include="Scripts\select2.min.js" />
@@ -762,9 +800,14 @@
     <Content Include="Views\Shared\_jsTreeDemo.cshtml" />
     <Content Include="Views\jsTree3\Demo.cshtml" />
     <Content Include="Views\jsTree3\AJAXDemo.cshtml" />
+    <Content Include="Views\Catalog\Index.cshtml" />
+    <Content Include="Views\Vendor\GetVendor.cshtml" />
+    <Content Include="Views\Item\TablePartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\Cart\" />
+    <Folder Include="Views\Order\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
@@ -785,6 +828,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201909122029358_FirstChange.resx">
       <DependentUpon>201909122029358_FirstChange.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201909141255313_CodeLenghtItem.resx">
+      <DependentUpon>201909141255313_CodeLenghtItem.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

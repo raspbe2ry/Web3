@@ -18,7 +18,7 @@ namespace Web3.Models
         [MaxLength(50)]
         public string Name { get; set; }
 
-        [MaxLength(10)]
+        [MaxLength(16)]
         public string Code { get; set; }
 
         [MaxLength(10)]

@@ -1,0 +1,197 @@
+﻿@model  Web3.Helpers.RowClickHandler.ItemClickHandlers
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-sm-6">
+                <h4>
+                    Items for catalog
+                </h4>
+            </div>
+            <div class="col-sm-6">
+                <h5 class="pull-right" id="itemsCatalogName" style="font-style: italic; color: slategray"></h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <table id="itemTable" class="display">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Code</th>
+                    <td>Category Code</td>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    var selfCatalogId = null;
+    var rowClickHandlerId = '@Model';
+
+    var addItemToCart = function (itemId, qty) {
+        $.ajax({
+            url: '@Url.Action("AddEntityToCart", "Cart")',
+            dataType: 'json',
+            type: 'POST',
+            data: {
+                itemId, 
+                qty
+            },
+            success: function (data) {
+                if (data >= 0) {
+                    $.notify("Successfully added to cart.", "success");
+                    $('#cartNumber').text(data);
+                }
+                else {
+                    $.notify("Error in adding to cart.", "error");
+                }
+            }
+        });
+    };
+
+    var openModalRowClickHandler = function (itemId) {
+        var dialog = bootbox.dialog({
+            title: 'Enter item quantity',
+            message: `<div class="form-group">
+                <label for= "email" > Item quantity</label>
+                <input type="number" class="form-control" id="itemQtyModalId" name="qty" placeholder="Enter quantity"></input>
+                </div >`,
+            closeButton: true,
+            buttons: [
+                {
+                    label: "Save",
+                    className: "btn btn-primary pull-rigth",
+                    callback: function () {
+                        var qty = $('#itemQtyModalId').val();
+                        addItemToCart(itemId, qty);
+                    }
+                },
+                {
+                    label: "Close",
+                    className: "btn btn-default pull-right",
+                    callback: function () {
+                    }
+                }
+            ],
+        });
+    };
+
+    var rowClickHandler = function (rowId) {
+        if (rowClickHandlerId == 'ModalOpening')
+            openModalRowClickHandler(rowId);
+    };
+
+    var updateItemsCatalogName = function (catalogName) {
+        $('#itemsCatalogName').text(catalogName);
+    };
+
+    $(document).ready(function () {
+
+        var collectItemFilter = function () {
+            return {
+                CatalogId: selfCatalogId
+            };
+        };
+
+        var itemTable = $('#itemTable').DataTable({
+                lengthChange: true,
+                autoWidth: false,
+                processing: true,
+                serverSide: true,
+                searching: true,
+                ordering: true,
+                paging: true,
+                fixedColumns: true,
+                fixedHeader: true,
+                scrollX: true,
+                scrollY: "700px",
+                scrollCollapse: true,
+                info: true,
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50, 100, 250, 500],
+                pagingType: "first_last_numbers",
+                createdRow: function (row, data, dataIndex) {
+                    $(row).attr('data-id', data.Id);
+                },
+                ajax: {
+                    url: '@Url.Action("GetItemData", "Item")',
+                    data: function (request) {
+                        var filtering = collectItemFilter();
+                        return {
+                            dtFilter: request,
+                            filter: filtering
+                        };
+                    },
+                    type: "POST",
+                    dataSrc: 'data'
+                },
+                language: {
+                    processing: ''
+                },
+                drawCallback: function (settings) {
+                    $('.table-overlay').hide();
+                },
+                columns: [{
+                    data: "Name",
+                    orderable: true,
+                    render: function (data, type, full, meta) {
+                        return "<span class='datacell'>" + (full.Name) + "</span>";
+                    }
+                }, {
+                    data: "Price",
+                    orderable: true,
+                    className: "text-left",
+                        render: function (data, type, full, meta) {
+                            return "<span class='datacell'>" + (full.Price) + "</span>";
+                    }
+                }, {
+                    data: "Code",
+                    orderable: true,
+                    className: "text-left",
+                        render: function (data, type, full, meta) {
+                            return "<span class='datacell'>" + (full.Code) + "</span>";
+                    }
+                }, {
+                    data: "Category Code",
+                    orderable: false,
+                        render: function (data, type, full, meta) {
+                        return "<span class='datacell'>" + (full.CategoryCode) + "</span>";
+                    }
+                }]
+        });
+
+    });
+
+    var drawItemTableForCatalog = function (catalogId) {
+        $("#itemTableDiv").css("display", "block");
+        selfCatalogId = catalogId;
+        changeCatalogHeader(catalogId);
+        $('#itemTable').DataTable().ajax.reload();
+    };
+
+    var changeCatalogHeader = function (catalogId) {
+        $.ajax({
+            url: '@Url.Action("GetCatalog", "Catalog")',
+            dataType: 'json',
+            type: 'POST',
+            data: {
+                id: catalogId
+            },
+            success: function (data) {
+                updateItemsCatalogName(data.Code);
+            }
+        });
+    };
+
+    $('#itemTable tbody').on('click', 'tr', function () {
+        var itemId = $(this).data("id");
+        rowClickHandler(itemId);
+    });
+
+</script>

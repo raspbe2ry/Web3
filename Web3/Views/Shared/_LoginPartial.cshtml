@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNet.Identity
+
 @if (Request.IsAuthenticated)
 {
     using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
@@ -10,6 +11,12 @@
             @Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
         </li>
         <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
+        <li id="cartLink" onclick="location.href = '@Url.Action("Index", "Home")';" style="cursor:grab;margin-top: 10px">
+            <span>
+                <i class="fa fa-shopping-cart" style="font-size:24px;color:white"></i>
+            </span>
+            <span id="cartNumber" style="font-size:20px;color:white;font-style:italic;font-family:Arial">0</span>
+        </li>
     </ul>
     }
 }
@@ -18,5 +25,28 @@ else
     <ul class="nav navbar-nav navbar-right">
         <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
         <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+        <li id="cartLink" onclick="location.href = '@Url.Action("Index", "Home")';" style="cursor:grab;margin-top: 10px">
+            <span>
+                <i class="fa fa-shopping-cart" style="font-size:24px;color:white"></i>
+            </span>
+            <span id="cartNumber" style="font-size:20px;color:white;font-style:italic;font-family:Arial">0</span>
+        </li>
     </ul>
 }
+
+<script>
+    var initializeCartNumber = function () {
+        $.ajax({
+            url: '@Url.Action("CheckCartState", "Cart")',
+            dataType: 'json',
+            type: 'POST',
+            success: function (data) {
+                $('#cartNumber').text(data);
+            }
+        });
+    };
+
+    $(document).ready(function () {
+        initializeCartNumber();
+    });
+</script>

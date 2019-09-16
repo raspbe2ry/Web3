@@ -20,12 +20,14 @@ namespace Web3
                         ));
 
             bundles.Add(new ScriptBundle("~/bundles/simpleJS").Include(
-                        "~/Scripts/moment.js"
+                        "~/Scripts/moment.js", 
+                        "~/Scripts/MyScripts/myScript.js"
             ));
 
             bundles.Add(new ScriptBundle("~/bundles/datatable").Include(
                         "~/Scripts/DataTables/jquery.dataTables.min.js",
                         "~/Scripts/DataTables/jquery.dataTables.plugins.js",
+                        "~/Scripts/DataTables/dataTables.buttons.min.js",
                         "~/Scripts/DataTables/extendDatatables.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
@@ -42,13 +44,16 @@ namespace Web3
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                       "~/Content/site.css",
+                      "~/Content/font-awesome.css",
+                      "~/Content/css/select2.css",
                       "~/Content/jsTree/themes/default/style.css"
                       ));
 
             bundles.Add(new StyleBundle("~/Content/datatable").Include(
                 "~/Content/DataTables/css/dataTables.bootstrap.css",
                 "~/Content/DataTables/css/dataTables.jqueryui.css",
-                "~/Content/DataTables/css/jquery.dataTables_themeroller.css"
+                "~/Content/DataTables/css/jquery.dataTables_themeroller.css",
+                "~/Content/DataTables/css/buttons.dataTables.min.css"
                 ));
 
         }

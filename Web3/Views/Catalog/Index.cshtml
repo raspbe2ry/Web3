@@ -1,0 +1,276 @@
+﻿@using Web3.Helpers.RowClickHandler
+
+@{
+    ViewBag.Title = "Catalogs Review";
+}
+
+<h2>Catalogs Review</h2>
+
+<div class="panel panel-default">
+    <div class="panel-heading" data-toggle="collapse" data-target="#bottomPart">
+        <h4>Filter</h4>
+    </div>
+    <div id="bottomPart" class="collapse">
+
+        <div class="panel-body">
+
+            <div class="row">
+                <div class='col-sm-2'>
+                    <label>Begining Date From:</label>
+                </div>
+
+                <div class='col-sm-3'>
+                    <div class="form-group">
+                        <div class='input-group date' id='beginingDateFromDT'>
+                            <input type='text' class="form-control" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class='col-sm-2'>
+                    <label>Begining Date To:</label>
+                </div>
+
+                <div class='col-sm-3'>
+                    <div class="form-group">
+                        <div class='input-group date' id='beginingDateToDT'>
+                            <input type='text' class="form-control" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class='col-sm-2'>
+                    <label>End Date From:</label>
+                </div>
+
+                <div class='col-sm-3'>
+                    <div class="form-group">
+                        <div class='input-group date' id='endDateFromDT'>
+                            <input type='text' class="form-control" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class='col-sm-2'>
+                    <label>End Date To:</label>
+                </div>
+
+                <div class='col-sm-3'>
+                    <div class="form-group">
+                        <div class='input-group date' id='endDateToDT'>
+                            <input type='text' class="form-control" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-2">
+                    <label>Vendors:</label>
+                </div>
+                <div class="col-sm-4">
+                    <select class="vendorFilter form-control" style="width: 250px"></select>
+                </div>
+            </div>
+
+            <div class="row">
+                <button class="applyFilterBtn btn btn-secondary pull-right" style="margin-right: 50px;">Apply</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <h4>Catalogs</h4>
+    </div>
+
+    <div class="panel-body">
+        <table id="catalogTable" class="display">
+            <thead>
+                <tr>
+                    <th>Discount</th>
+                    <th>Begining Date</th>
+                    <th>End Date</th>
+                    <td>Code</td>
+                    <td>Vendor</td>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="itemTableDiv" style="display: none">
+    @{Html.RenderPartial("~/Views/Item/TablePartial.cshtml", ItemClickHandlers.ModalOpening);}
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        var collectCatalogFilter = function () {
+            var beginingDateFrom = new Date($('#beginingDateFromDT').find("input").val());
+            var beginingDateTo = new Date($('#beginingDateToDT').find("input").val());
+            var endDateFrom = new Date($('#endDateFromDT').find("input").val());
+            var endDateTo = new Date($('#endDateToDT').find("input").val());
+            var vendorId = $(".vendorFilter").val();
+
+            return {
+                BeginingDateFrom: beginingDateFrom != 'Invalid Date' ? beginingDateFrom.toISOString() : null,
+                BeginingDateTo: beginingDateTo != 'Invalid Date' ? beginingDateTo.toISOString() : null,
+                EndDateFrom: endDateFrom != 'Invalid Date' ? endDateFrom.toISOString() : null,
+                EndDateTo: endDateTo != 'Invalid Date' ? endDateTo.toISOString() : null,
+                VendorId: vendorId
+            };
+        }
+
+        var catalogTable = $('#catalogTable').DataTable({
+                lengthChange: true,
+                autoWidth: false,
+                processing: true,
+                serverSide: true,
+                searching: true,
+                ordering: true,
+                paging: true,
+                fixedColumns: true,
+                fixedHeader: true,
+                scrollX: true,
+                scrollY: "700px",
+                scrollCollapse: true,
+                info: true,
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50, 100, 250, 500],
+                pagingType: "first_last_numbers",
+                createdRow: function (row, data, dataIndex) {
+                    $(row).attr('data-id', data.Id);
+                },
+                ajax: {
+                    url: '@Url.Action("GetCatalogData", "Catalog")',
+                    data: function (request) {
+                        var filtering = collectCatalogFilter();
+                        return {
+                            dtFilter: request,
+                            filter: filtering
+                        };
+                    },
+                    type: "POST",
+                    dataSrc: 'data'
+                },
+                language: {
+                    processing: ''
+                },
+                drawCallback: function (settings) {
+                    $('.table-overlay').hide();
+                },
+                columns: [{
+                    data: "Discount",
+                    orderable: true,
+                    render: function (data, type, full, meta) {
+                        return "<span class='datacell'>" + (full.Discount) + "</span>";
+                    }
+                }, {
+                    data: "BeginingDate",
+                    orderable: true,
+                    className: "text-left",
+                        render: function (data, type, full, meta) {
+                            return "<span class='datacell'>" + (nmDataFormater(full.BeginingDate)) + "</span>";
+                    }
+                }, {
+                    data: "EndDate",
+                    orderable: true,
+                    className: "text-left",
+                        render: function (data, type, full, meta) {
+                            return "<span class='datacell'>" + (nmDataFormater(full.EndDate)) + "</span>";
+                    }
+                }, {
+                    data: "Code",
+                    orderable: true,
+                        render: function (data, type, full, meta) {
+                        return "<span class='datacell'>" + (full.Code) + "</span>";
+                    }
+                }, {
+                    data: "Vendor",
+                    orderable: true,
+                        render: function (data, type, full, meta) {
+                            return "<span class='datacell'>"
+                                + " <a href = '/Vendor/GetVendor?id=" + full.VendorId + "' >"+ full.VendorName + "</a>"
+                                + "</span>";
+                    }
+                }]
+        });
+
+        $('#beginingDateFromDT').datetimepicker({
+            locale: 'ru'
+        });
+
+        $('#beginingDateToDT').datetimepicker({
+            locale: 'ru'
+        });
+
+        $('#endDateFromDT').datetimepicker({
+            locale: 'ru'
+        });
+   
+        $('#endDateToDT').datetimepicker({
+            locale: 'ru'
+        });
+
+        $('.vendorFilter').select2(
+            {
+                placeholder: "Select Vendor",
+                minimumInputLength: 0,
+                allowClear: true,
+                language: { errorLoading: function () { return "Searching..." } },
+                ajax: {
+                    delay: 150,
+                    url: '@Url.Action("GetVendorSelectList", "Vendor")',
+                    dataType: 'json',
+                    data: function (params) {
+                        params.page = params.page || 1;
+                        return {
+                            searchTerm: params.term,
+                            pageSize: 20,
+                            pageNumber: params.page
+                        };
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.Results,
+                            pagination: {
+                                more: (params.page * 20) < data.Total
+                            }
+                        };
+                    }
+                }
+            });
+
+        $(".applyFilterBtn").click(function () {
+            catalogTable.draw();
+        });
+
+        $('#catalogTable tbody').on('click', 'tr', function () {
+            var catalogId = $(this).data("id");
+            drawItemTableForCatalog(catalogId);
+        });
+
+    });
+</script>
+
+
