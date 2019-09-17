@@ -192,6 +192,8 @@
     <Compile Include="DL\ItemRepository.cs" />
     <Compile Include="DL\VendorRepository.cs" />
     <Compile Include="DOL\CartEntity.cs" />
+    <Compile Include="DOL\ItemCategoryDetails.cs" />
+    <Compile Include="DOL\ItemDetails.cs" />
     <Compile Include="DTO\DTOCatalog.cs" />
     <Compile Include="DTO\DTOItem.cs" />
     <Compile Include="DTO\DTOVendor.cs" />
@@ -803,10 +805,10 @@
     <Content Include="Views\Catalog\Index.cshtml" />
     <Content Include="Views\Vendor\GetVendor.cshtml" />
     <Content Include="Views\Item\TablePartial.cshtml" />
+    <Content Include="Views\Cart\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Cart\" />
     <Folder Include="Views\Order\" />
   </ItemGroup>
   <ItemGroup>

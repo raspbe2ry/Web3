@@ -1,0 +1,136 @@
+﻿@model List<Web3.DOL.ItemCategoryDetails>
+
+<style>
+    .catClass {
+        background-color: #43857C;
+        height: 50px;
+        font-size: 24px;
+        font-family: Verdana;
+        font-style: italic oblique;
+        color: #00352E;
+        border-bottom: 2px solid black;
+    }
+
+    .itClass {
+        background-color: #6BA099;
+        height: 30px;
+        font-size: 16px;
+        font-family: Verdana;
+        font-style: italic;
+        color: #00352E;
+        border-bottom: 1px solid black;
+    }
+
+    .itHead {
+        background-color: #6BA099;
+        height: 30px;
+        font-size: 20px;
+        font-family: Verdana;
+        font-style: oblique;
+        color: #00352E;
+        border-bottom: 1px solid black;
+    }
+
+    .itFoot {
+        background-color: #42726C;
+        height: 30px;
+        font-size: 20px;
+        font-family: Verdana;
+        font-style: oblique;
+        color: #00352E;
+        border-bottom: 1px solid black;
+    }
+
+    .itmQty {
+        width: 120px;
+        background-color: #6C7977;
+    }
+
+</style>
+
+<h2>Cart Review</h2>
+
+<br />
+<br />
+<div class="panel panel-default">
+
+    <div class="panel-heading" data-toggle="collapse" data-target="#bottomPart">
+        <h4>
+            Items in cart
+        </h4>
+    </div>
+
+    <div id="bottomPart" class="collapse">
+        <div class="panel-body">
+            @foreach (var category in Model)
+            {
+                var p = string.Concat(".itm", category.CategoryCode);
+                var l = string.Concat("itm", category.CategoryCode);
+                <div class='row catClass' data-toggle='collapse' data-target='@p' data-catid="@category.CategoryCode">
+                    <div class="col-sm-8">@category.CategoryCode</div>
+                    <div class="col-sm-2">@category.Qty</div>
+                    <div class="col-sm-2 catPrice">@category.TotalPrice</div>
+                </div>
+                <div class="row itClass itHead @l">
+                    <div class="col-sm-3">Item Name</div>
+                    <div class="col-sm-3">Item Code</div>
+                    <div class="col-sm-2">Price</div>
+                    <div class="col-sm-2">Quantity</div>
+                    <div class="col-sm-2">Total Price</div>
+                </div>
+                    foreach (var item in category.ItemDetails)
+                    {
+                        <div class="row itClass @l" data-id="@item.ItemId">
+                            <div class="col-sm-3">@item.ItemName</div>
+                            <div class="col-sm-3">@item.ItemCode</div>
+                            <div class="col-sm-2">@item.OneInstancePrice</div>
+                            <div class="col-sm-2">
+                                <input class="itmQty" type="number" data-catcode="@category.CategoryCode" data-price="@item.OneInstancePrice" data-discount="@item.Discount" data-val="@item.Qty" value="@item.Qty"/>
+                            </div>
+                            <div class="col-sm-2 rowPrice">@item.TotalPrice</div>
+                        </div>
+                    }
+            }
+            <div class="row itFoot pull-right">
+                Total Price: <label class="totPrice">@ViewBag.TotalAmount</label>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#bottomPart').collapse('show');
+
+        $(".itmQty").on('change', function () {
+            var prev = $(this).data('val');
+            var price = $(this).data('price');
+            var discount = $(this).data('discount');
+            var current = $(this).val();
+            $(this).data('val', current);
+
+            var dif = (current - prev) * (1 - discount) * price;
+
+            var catcode = $(this).data('catcode');
+            var rowPrice = Number($(this).parent().parent().find('.rowPrice').text());
+            var catPrice = Number($('[data-catid="' + catcode + '"]').find('.catPrice').text());
+            var totPrice = Number($('.totPrice').text());
+
+            rowPrice = (rowPrice + dif).toFixed(4);
+            catPrice = (catPrice + dif).toFixed(4);
+            totPrice = (totPrice + dif).toFixed(4);
+
+            $(this).parent().parent().find('.rowPrice').text(rowPrice);
+            $('[data-catid="' + catcode + '"]').find('.catPrice').text(catPrice);
+            $('.totPrice').text(totPrice);
+
+            debugger;
+        });
+    });
+</script>

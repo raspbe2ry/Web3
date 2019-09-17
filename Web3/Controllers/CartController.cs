@@ -9,6 +9,21 @@ namespace Web3.Controllers
 {
     public class CartController : Controller
     {
+        public ActionResult Index()
+        {
+            var model = new List<ItemCategoryDetails>();
+
+            if (TempData["CartHasItems"] != null)
+            {
+                Cart currentCart = (Cart)TempData["CurrentCart"];
+                model = currentCart.GetItemsByCategory();                
+            }
+
+            ViewBag.TotalAmount = model.Sum(x => x.TotalPrice);
+
+            return View(model);
+        }
+
         public JsonResult AddEntityToCart(int itemId, int qty)
         {
             int differentItemsInCart = -1;
