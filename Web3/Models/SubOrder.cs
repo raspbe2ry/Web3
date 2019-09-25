@@ -13,7 +13,8 @@ namespace Web3.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public DateTime ExpectedShipmentDate { get; set; }
+        public DateTime? ExpectedShipmentDate { get; set; }
+        public decimal? Price { get; set; }
 
         public int? VendorId { get; set; }
         [ForeignKey("VendorId")]

@@ -53,9 +53,12 @@ namespace Web3.DL
             return dbSet.Find(id);
         }
 
-        public virtual void Insert(TEntity entity)
+        public int Insert(TEntity entity)
         {
             dbSet.Add(entity);
+            context.SaveChanges();
+
+            return (int)entity.GetType().GetProperty("Id").GetValue(entity, null);
         }
 
         public virtual void Delete(object id)
@@ -77,6 +80,11 @@ namespace Web3.DL
         {
             dbSet.Attach(entityToUpdate);
             context.Entry(entityToUpdate).State = EntityState.Modified;
+        }
+
+        public virtual void Save()
+        {
+            context.SaveChanges();
         }
     }
 }

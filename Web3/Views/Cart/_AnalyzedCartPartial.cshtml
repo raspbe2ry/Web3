@@ -1,0 +1,127 @@
+﻿@model List<Web3.DOL.BestItemOffer>
+
+<table id="analyzeTable" class="display nowrap" style="width:100%">
+    <thead>
+        <tr>
+            <th></th>
+            <td>Category Code</td>
+            <td>Item Code</td>
+            <td>Original Price</td>
+            <td>Original Discount</td>
+            <td>With Discount</td>
+            <td>Original Vendor</td>
+            <td>Best Item Code</td>
+            <td>Best Price</td>
+            <td>Best Discount</td>
+            <td>Best With Discount</td>
+            <td>Best Vendor</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var item in Model)
+        {
+            string bc;
+            bool be = false;
+            if (item.BestItemId == item.ItemId)
+            {
+                bc = "green";
+                be = false;
+            }
+            else {
+                bc = "white";
+                be = true;
+            }
+        <tr style='background-color: @bc'>
+            @if (be)
+             {
+            <td>
+                <button class="btn btn-success" onclick="convertItem(this)" data-categoryCode="@item.CategoryCode" data-oItemId="@item.ItemId" data-bItemId="@item.BestItemId">Convert</button>
+            </td>
+            }
+            else
+            {
+            <td>
+            </td>
+            }
+            <td>@item.CategoryCode</td>
+            <td>@item.ItemCode</td>
+            <td>@item.OriginalPrice</td>
+            <td>@item.OriginalDiscount</td>
+            <td>@item.OriginalPriceWithDiscount</td>
+            <td>@item.OriginalVendorName</td>
+            <td>@item.BestItemCode</td>
+            <td>@item.BestPrice</td>
+            <td>@item.BestDiscount</td>
+            <td>@item.BestPriceWithDiscount</td>
+            <td>@item.BestVendorName</td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    var convertItem = function (e) {
+        var elementBtn = $(e);
+        var ItemId = elementBtn.data('oitemid');
+        var BestItemId = elementBtn.data('bitemid');
+        var CategoryCode = elementBtn.data('categorycode');  
+
+        $.ajax({
+            url: "@Url.Action("ConvertItem", "Cart")",
+            type: "POST",
+            data: {
+                ItemId, BestItemId, CategoryCode 
+            },
+            success: function (result) {
+                if (result.success) {
+                    changeInCart = true;
+                    var element = $('[data-id="' + result.oldId + '"]');
+
+                    var itemCode = element.find('[data-key=itemcode]');
+                    var price = element.find('[data-key=price]');
+                    var discprice = element.find('[data-key=discprice]');
+                    var qty = element.find('[data-key=qty]');
+                    var qtyInput = qty.find('.itmQty');
+
+                    var rowTotPrice = element.find('[data-key=totprice]');
+                    var catTotPrice = $('[data-catid="' + result.replacement.CategoryCode + '"]').find('.catPrice');
+                    var totPrice = $('.totPrice');
+
+                    var qtyValue = Number(qtyInput.val());
+                    var discPriceValue = Number(discprice.text());
+                    var newDiscPriceValue = result.replacement.DiscountedPrice;
+                    var rowPriceOld = Number(rowTotPrice.text());
+                    var catPriceOld = Number(catTotPrice.text());
+                    var totPriceOld = Number(totPrice.text());
+
+                    var priceDelta = qtyValue * (newDiscPriceValue - discPriceValue);
+                    var totPriceNew = totPriceOld + priceDelta;
+                    var catPriceNew = catPriceOld + priceDelta;
+                    var rowPriceNew = rowPriceOld + priceDelta;
+
+                    totPrice.text(totPriceNew.toFixed(4));
+                    catTotPrice.text(catPriceNew.toFixed(4));
+                    rowTotPrice.text(rowPriceNew.toFixed(4));
+
+                    itemCode.text(result.replacement.ItemCode);
+                    price.text(result.replacement.OneInstancePrice);
+                    discprice.text(result.replacement.DiscountedPrice);
+                    qtyInput.data('price', result.replacement.OneInstancePrice);
+                    qtyInput.data('discount', result.replacement.Discount);
+
+                    element.data('id', result.replacement.ItemId);
+
+                    elementBtn.parent().parent().css('background-color', 'green');
+                    elementBtn.remove();
+                }
+                else {
+                    $.notify("Error ocured during conversion performing.", "error");
+                }
+            },
+            error: function(err){
+                $.notify("Error ocured during conversion performing.", "error");
+            }
+        });
+    }
+</script>
+

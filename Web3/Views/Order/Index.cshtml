@@ -1,0 +1,281 @@
+﻿<style>
+    td.details-control {
+        cursor: pointer;
+    }
+</style>
+
+@{
+    ViewBag.Title = "Orders Review";
+}
+
+<br />
+<h2>Catalogs Review</h2>
+<br />
+
+<div class="panel panel-default">
+    <div class="panel-heading" data-toggle="collapse" data-target="#bottomPart">
+        <h4>Filter</h4>
+    </div>
+
+    <div id="bottomPart" class="collapse">
+
+        <div class="panel-body">
+
+            <div class="row">
+                <div class='col-sm-2'>
+                    <label>Order Date From:</label>
+                </div>
+
+                <div class='col-sm-3'>
+                    <div class="form-group">
+                        <div class='input-group date' id='orderDateFromDT'>
+                            <input type='text' class="form-control" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class='col-sm-2'>
+                    <label>Order Date To:</label>
+                </div>
+
+                <div class='col-sm-3'>
+                    <div class="form-group">
+                        <div class='input-group date' id='orderDateToDT'>
+                            <input type='text' class="form-control" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class='col-sm-2'>
+                    <label>Price From:</label>
+                </div>
+
+                <div class='col-sm-3'>
+                    <div class="form-group">
+                        <input type="number" id="priceFrom" />
+                    </div>
+                </div>
+
+                <div class='col-sm-2'>
+                    <label>Price To:</label>
+                </div>
+
+                <div class='col-sm-3'>
+                    <div class="form-group">
+                        <input type="number" id="priceTo" />
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <button class="applyFilterBtn btn btn-secondary pull-right" style="margin-right: 50px;">Apply</button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <h4>Orders</h4>
+    </div>
+
+    <br />
+    <div class="panel-body">
+        <table id="orderTable" class="display">
+            <thead>
+                <tr>
+                    <td>Order Date</td>
+                    <td>Employee</td>
+                    <td>Order Price</td>
+                    <td></td>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="panel-footer">
+    </div>
+</div>
+
+<script>
+    var collectOrderFilter = function () {
+        var orderDateFrom = new Date($('#orderDateFromDT').find("input").val());
+        var orderDateTo = new Date($('#orderDateToDT').find("input").val());
+        var priceFrom = $('#priceFrom').val();
+        var priceTo = $('#priceTo').val();
+
+        return {
+            OrderDateFrom: orderDateFrom != 'Invalid Date' ? orderDateFrom.toISOString() : null,
+            OrderDateTo: orderDateTo != 'Invalid Date' ? orderDateTo.toISOString() : null,
+            PriceFrom: priceFrom,
+            PriceTo: priceTo
+        };
+    }
+
+    var formatSubOrders = function (orderTable, r, orderId) {
+        var mm = orderId.toString();
+            $.ajax({
+            url: "@Url.Action("GetSubOrderData", "SubOrder")",
+            type: "POST",
+            data: {
+                orderId
+            },
+            success: function (result) {
+                if (result.recordsTotal > 0) {
+                    var tableResult = '<table class="subOrderClass'+mm+'">';
+                    tableResult += '<thead><th>Exprected Shipment Date</th><th>Price</th><th>Vendor</th></thead>'
+                    tableResult += '<tbody>';
+
+                    for (var i = 0; i < result.data.length; i++) {
+                        tableResult += '<tr data-id=' + result.data[i].Id +'>';
+                        tableResult += '<td style="width: 34%">' + result.data[i].ExpectedShipmentDate + '</td>';
+                        tableResult += '<td style="width: 33%">' + result.data[i].Price + '</td>';
+                        tableResult += '<td style="width: 33%" data-id=' + result.data[i].VendorId +'>' + result.data[i].VendorName + '</td>';
+                        tableResult += '</tr>';
+                    }
+
+                    tableResult += '</tbody>';
+                    tableResult += '</table>';
+
+                    var tr = $(r).closest('tr');
+                    var orderId = $(r).data('id');
+                    var row = orderTable.row(tr);
+                    var control = $(r).find('.fa');
+
+                    row.child(tableResult).show();
+                    tr.addClass('shown');
+                    control.removeClass('fa-plus');
+                    control.addClass('fa-minus');
+
+                    $('.subOrderClass'+mm).DataTable({
+                        searching: false,
+                        ordering: false,
+                        paging: false,
+                        info: false
+                    });
+
+                    $('.subOrderClass' + mm).find('td').css('background', '#88C185');
+
+                }
+            },
+                error: function (err) {
+                    return ''; 
+            }
+        });
+    }
+
+
+    $(document).ready(function () {
+
+        $('#orderDateFromDT').datetimepicker({
+            locale: 'ru'
+        });
+
+        $('#orderDateToDT').datetimepicker({
+            locale: 'ru'
+        });
+
+        var orderTable = $('#orderTable').DataTable({
+            lengthChange: true,
+            autoWidth: false,
+            processing: true,
+            serverSide: true,
+            searching: true,
+            ordering: true,
+            paging: true,
+            fixedColumns: true,
+            fixedHeader: true,
+            scrollX: true,
+            scrollY: "700px",
+            scrollCollapse: true,
+            info: true,
+            pageLength: 10,
+            lengthMenu: [5, 10, 25, 50, 100, 250, 500],
+            pagingType: "first_last_numbers",
+            createdRow: function (row, data, dataIndex) {
+                $(row).attr('data-id', data.Id);
+            },
+            ajax: {
+                url: '@Url.Action("GetOrderData", "Order")',
+                data: function (request) {
+                    var filtering = collectOrderFilter();
+                    return {
+                        dtFilter: request,
+                        filter: filtering
+                    };
+                },
+                type: "POST",
+                dataSrc: 'data'
+            },
+            language: {
+                processing: ''
+            },
+            drawCallback: function (settings) {
+                $('.table-overlay').hide();
+            },
+            columns: [{
+                data: "Date",
+                orderable: true,
+                render: function (data, type, full, meta) {
+                    return "<span class='datacell'>" + (nmDataFormater(full.OrderDate)) + "</span>";
+                }
+            }, {
+                data: "Employee",
+                orderable: true,
+                className: "text-left",
+                render: function (data, type, full, meta) {
+                    return "<span class='datacell'>" + (full.EmployeeName) + "</span>";
+                }
+            }, {
+                data: "Price",
+                orderable: true,
+                className: "text-left",
+                render: function (data, type, full, meta) {
+                    return "<span class='datacell'>" + (full.Price) + "</span>";
+                }
+            }
+                ,{
+                    className: 'details-control',
+                    orderable: false,
+                    data: null,
+                    render: function (data, type, full, meta) {
+                        return "<span class='datacell'>" + "<i class='fa fa-plus' aria-hidden='true'></i>" + "</span>";
+                    }
+            }]
+        });
+
+        $('#orderTable tbody').on('click', 'td.details-control', function () {
+            var tr = $(this).closest('tr');
+            var orderId = $(this).closest('tr').data('id');
+            var row = orderTable.row(tr);
+            var control = $(this).find('.fa');
+
+            if (row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                control.removeClass('fa-minus');
+                control.addClass('fa-plus');
+            }
+            else {
+                formatSubOrders(orderTable, this, orderId);
+            }
+        });
+
+        $('.applyFilterBtn').on('click', function () {
+            $('#orderTable').DataTable().ajax.reload();
+        });
+    });
+
+</script>

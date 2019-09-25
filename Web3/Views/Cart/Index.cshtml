@@ -45,7 +45,6 @@
         width: 120px;
         background-color: #6C7977;
     }
-
 </style>
 
 <h2>Cart Review</h2>
@@ -61,35 +60,37 @@
     </div>
 
     <div id="bottomPart" class="collapse">
-        <div class="panel-body">
+        <div class="panel-body cartBody">
             @foreach (var category in Model)
             {
                 var p = string.Concat(".itm", category.CategoryCode);
                 var l = string.Concat("itm", category.CategoryCode);
                 <div class='row catClass' data-toggle='collapse' data-target='@p' data-catid="@category.CategoryCode">
                     <div class="col-sm-8">@category.CategoryCode</div>
-                    <div class="col-sm-2">@category.Qty</div>
+                    <div class="col-sm-2 catQty">@category.Qty</div>
                     <div class="col-sm-2 catPrice">@category.TotalPrice</div>
                 </div>
                 <div class="row itClass itHead @l">
                     <div class="col-sm-3">Item Name</div>
-                    <div class="col-sm-3">Item Code</div>
-                    <div class="col-sm-2">Price</div>
+                    <div class="col-sm-2">Item Code</div>
+                    <div class="col-sm-1">Price</div>
+                    <div class="col-sm-2">Dis. Price</div>
                     <div class="col-sm-2">Quantity</div>
                     <div class="col-sm-2">Total Price</div>
                 </div>
-                    foreach (var item in category.ItemDetails)
-                    {
-                        <div class="row itClass @l" data-id="@item.ItemId">
-                            <div class="col-sm-3">@item.ItemName</div>
-                            <div class="col-sm-3">@item.ItemCode</div>
-                            <div class="col-sm-2">@item.OneInstancePrice</div>
-                            <div class="col-sm-2">
-                                <input class="itmQty" type="number" data-catcode="@category.CategoryCode" data-price="@item.OneInstancePrice" data-discount="@item.Discount" data-val="@item.Qty" value="@item.Qty"/>
-                            </div>
-                            <div class="col-sm-2 rowPrice">@item.TotalPrice</div>
-                        </div>
-                    }
+                foreach (var item in category.ItemDetails)
+                {
+                <div class="row itClass itInstance @l" data-id="@item.ItemId">
+                    <div class="col-sm-3">@item.ItemName</div>
+                    <div class="col-sm-2" data-key="itemcode">@item.ItemCode</div>
+                    <div class="col-sm-1" data-key="price">@item.OneInstancePrice</div>
+                    <div class="col-sm-2" data-key="discprice">@item.DiscountedPrice</div>
+                    <div class="col-sm-2" data-key="qty">
+                        <input class="itmQty" type="number" data-catcode="@category.CategoryCode" data-price="@item.OneInstancePrice" data-discount="@item.Discount" data-val="@item.Qty" value="@item.Qty" />
+                    </div>
+                    <div class="col-sm-2 rowPrice" data-key="totprice">@item.TotalPrice</div>
+                </div>
+                }
             }
             <div class="row itFoot pull-right">
                 Total Price: <label class="totPrice">@ViewBag.TotalAmount</label>
@@ -97,40 +98,161 @@
         </div>
     </div>
 
-    <div>
-        <div>
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-sm-6"></div>
+            <button class="btn btn-default col-sm-2 pull-right cartSave" style="margin-left:10px; margin-right: 10px;">Save</button>
+            <button class="btn btn-default col-sm-2 pull-right cartOrder" style="margin-left:10px; margin-right: 10px;">Order</button>
+            <button class="btn btn-success col-sm-2 pull-right cartAnalyze" style="margin-left:10px; margin-right: 10px;">Analyze</button>
         </div>
     </div>
+</div>
 
+<br />
+<br />
+<div class="panel panel-success analyzedPanel" style="display: none;">
+    <div class="panel-heading">
+        <h4>Best Offers</h4>
+    </div>
+
+    <div class="panel-body analyzedCart">
+    </div>
+
+    <div class="panel-footer">
+
+    </div>
 </div>
 
 <script>
+    var changeInCart = false;
+
+    var analyzeCart = function () {
+        $('.analyzedPanel').show();
+
+        $.ajax({
+            url: "@Url.Action("AnalyzeCart", "Cart")",
+            type: "POST",
+            success: function (result) {
+                $('.analyzedCart').html(result);
+                $('#analyzeTable').DataTable({
+                    scrollX: true,
+                });
+
+            },
+            error: function(err){
+                $.notify("Error ocured during cart saving.", "error");
+            }
+        });
+    };
+
+    var saveCart = function (items) {
+        $.ajax({
+            url: "@Url.Action("SaveCart", "Cart")",
+            type: "POST",
+            data: {
+                items
+            },
+            success: function (result) {
+                if (result.success) {
+                    $.notify("Cart is successfully saved.", "success");
+                    changeInCart = false;
+                }
+                else {
+                    $.notify("Error ocured during cart saving.", "error");
+                }
+            },
+            error: function(err){
+                $.notify("Error ocured during cart saving.", "error");
+            }
+        });
+    }
+
+    var performOrder = function () {
+        $.ajax({
+            url: "@Url.Action("PerformOrder", "Order")",
+            type: "POST",
+            success: function (result) {
+                if (result.success) {
+                    $.notify("Order is successfully performed.", "success");
+                    changeInCart = false;
+                    $('.cartBody').empty();
+                    $('#cartNumber').text("0");
+                    $('.analyzedPanel').hide();
+                }
+                else {
+                    if (result.message != null) {
+                        $.notify(message, "error");
+                    }
+                    else {
+                        $.notify("Error ocured during order performing.", "error");
+                    }
+                }
+            },
+            error: function(err){
+                $.notify("Error ocured during order performing.", "error");
+            }
+        });
+    }
+
     $(document).ready(function () {
         $('#bottomPart').collapse('show');
 
         $(".itmQty").on('change', function () {
+            debugger;
+            changeInCart = true;
+
             var prev = $(this).data('val');
             var price = $(this).data('price');
             var discount = $(this).data('discount');
             var current = $(this).val();
             $(this).data('val', current);
 
-            var dif = (current - prev) * (1 - discount) * price;
+            var dif = (current - prev) * (1 - discount*0.01) * price;
 
             var catcode = $(this).data('catcode');
             var rowPrice = Number($(this).parent().parent().find('.rowPrice').text());
             var catPrice = Number($('[data-catid="' + catcode + '"]').find('.catPrice').text());
+            var catQty = Number($('[data-catid="' + catcode + '"]').find('.catQty').text());
             var totPrice = Number($('.totPrice').text());
 
             rowPrice = (rowPrice + dif).toFixed(4);
             catPrice = (catPrice + dif).toFixed(4);
+            catQty = catQty + (current - prev);
             totPrice = (totPrice + dif).toFixed(4);
 
             $(this).parent().parent().find('.rowPrice').text(rowPrice);
             $('[data-catid="' + catcode + '"]').find('.catPrice').text(catPrice);
+            $('[data-catid="' + catcode + '"]').find('.catQty').text(catQty);
             $('.totPrice').text(totPrice);
 
-            debugger;
+        });
+
+        $(".cartSave").on('click', function () {
+            var items = $('.itInstance').toArray();
+
+            var reducedItems = items.map(function(x){
+                var qty = $(x).find('.itmQty').val();
+                var itemId = $(x).data('id');
+                return {
+                    qty,
+                    itemId
+                }
+            });
+
+            saveCart(reducedItems);
+        });
+
+        $(".cartOrder").on('click', function () {
+            if (changeInCart) {
+                $.notify("There is a change in a cart. Please save changes before order.", "error");
+            }
+            else {
+                performOrder();
+            }
+        });
+
+        $(".cartAnalyze").on('click', function () {
+            analyzeCart();
         });
     });
 </script>

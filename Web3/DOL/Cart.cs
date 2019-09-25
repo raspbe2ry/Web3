@@ -31,18 +31,19 @@ namespace Web3.DOL
                             ItemId = i.Id,
                             Qty = el.Qty,
                             OneInstancePrice = i.Price,
-                            TotalPrice = i.Price *el.Qty * (1 -  c.Discount),
+                            DiscountedPrice = i.Price * (1 - c.Discount * (decimal)0.01),
+                            TotalPrice = i.Price * el.Qty * (1 - c.Discount* (decimal)0.01),
                             Discount = c.Discount,
                             ItemCode = i.Code,
                             ItemName = i.Name,
-                            CategoryCode = c.Code
+                            CategoryCode = i.CategoryCode
                         } into itemWithCat
                         group itemWithCat by itemWithCat.CategoryCode into res
                         select new ItemCategoryDetails()
                         {
-                            CategoryCode = res.Key, 
+                            CategoryCode = res.Key,
                             Qty = res.Sum(x => x.Qty),
-                            TotalPrice = res.Sum(x=> x.TotalPrice),
+                            TotalPrice = res.Sum(x => x.TotalPrice),
                             ItemDetails = res.ToList()
                         }).ToList();
 
@@ -51,3 +52,4 @@ namespace Web3.DOL
         }
     }
 }
+
