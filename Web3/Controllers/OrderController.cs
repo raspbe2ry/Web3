@@ -21,7 +21,7 @@ namespace Web3.Controllers
 
         public JsonResult GetOrderData(DataTableFilter dtFilter, OrderFilter filter)
         {
-            var data = DTOOrder.MapToDTO(OrderRepository.GetData(dtFilter, filter));
+            var data = DTOOrder.MapToDTO(new OrderRepository().GetData(dtFilter, filter));
 
             return Json(new
             {
@@ -45,11 +45,11 @@ namespace Web3.Controllers
                         Qty = x.Qty
                     }).ToList();
 
-                    int orderId = OrderRepository.CreateOrder();
+                    int orderId = new OrderRepository().CreateOrder();
 
-                    List<int> subOrderIds = SubOrderRepository.Create(orderItems, orderId);
+                    List<int> subOrderIds = new SubOrderRepository().Create(orderItems, orderId);
 
-                    List<int> orderItemIds = OrderItemRepository.CreateOrderItems(orderItems, orderId);
+                    List<int> orderItemIds = new OrderItemRepository().CreateOrderItems(orderItems, orderId);
                 }
                 else
                 {

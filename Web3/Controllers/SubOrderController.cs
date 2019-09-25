@@ -13,7 +13,7 @@ namespace Web3.Controllers
     {
         public JsonResult GetSubOrderData(int? orderId, DataTableFilter dtFilter)
         {
-            var data = DTOSubOrder.MapToDTO(SubOrderRepository.GetData(dtFilter, orderId));
+            var data = DTOSubOrder.MapToDTO(new SubOrderRepository().GetData(dtFilter, orderId));
 
             return Json(new
             {

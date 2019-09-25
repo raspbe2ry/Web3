@@ -14,7 +14,7 @@ namespace Web3.Controllers
     {
         public JsonResult GetItemData(DataTableFilter dtFilter, ItemFilter filter)
         {
-            var data = DTOItem.MapToDTO(ItemRepository.GetData(dtFilter, filter));
+            var data = DTOItem.MapToDTO(new ItemRepository().GetData(dtFilter, filter));
 
             return Json(new
             {

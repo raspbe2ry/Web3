@@ -11,9 +11,9 @@ namespace Web3.DL
 {
     public class ItemRepository
     {
-        private static GenericRepository<Item> repo = new GenericRepository<Item>(new ApplicationDbContext());
+        private GenericRepository<Item> repo = new GenericRepository<Item>(new ApplicationDbContext());
 
-        public static DataResult<Item> GetData(DataTableFilter dtFilter, ItemFilter filter)
+        public DataResult<Item> GetData(DataTableFilter dtFilter, ItemFilter filter)
         {
             DataResult<Item> dataResult = new DataResult<Item>();
 

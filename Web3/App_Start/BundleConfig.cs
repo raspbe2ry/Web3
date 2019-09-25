@@ -22,6 +22,10 @@ namespace Web3
             bundles.Add(new ScriptBundle("~/bundles/simpleJS").Include(
                         "~/Scripts/moment.js", 
                         "~/Scripts/MyScripts/myScript.js"
+            )); 
+
+            bundles.Add(new ScriptBundle("~/bundles/highcharts").Include(
+                "~/Scripts/highcharts/7.1.2/highcharts.js"
             ));
 
             bundles.Add(new ScriptBundle("~/bundles/datatable").Include(
@@ -46,7 +50,8 @@ namespace Web3
                       "~/Content/site.css",
                       "~/Content/font-awesome.css",
                       "~/Content/css/select2.css",
-                      "~/Content/jsTree/themes/default/style.css"
+                      "~/Content/jsTree/themes/default/style.css",
+                      "~/Scripts/highcharts/7.1.2/css/highcharts.css"
                       ));
 
             bundles.Add(new StyleBundle("~/Content/datatable").Include(

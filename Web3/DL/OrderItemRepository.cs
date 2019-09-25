@@ -9,16 +9,26 @@ namespace Web3.DL
 {
     public class OrderItemRepository
     {
-        private static ApplicationDbContext dbContext = new ApplicationDbContext();
+        private GenericRepository<OrderItem> orderItemRepo;
+        private GenericRepository<Item> itemRepo;
+        private GenericRepository<Vendor> vendorRepo;
+        private GenericRepository<Catalog> catalogRepo;
+        private GenericRepository<Order> orderRepo;
+        private GenericRepository<SubOrder> subOrderRepo;
 
-        private static GenericRepository<OrderItem> orderItemRepo = new GenericRepository<OrderItem>(dbContext);
-        private static GenericRepository<Item> itemRepo = new GenericRepository<Item>(dbContext);
-        private static GenericRepository<Vendor> vendorRepo = new GenericRepository<Vendor>(dbContext);
-        private static GenericRepository<Catalog> catalogRepo = new GenericRepository<Catalog>(dbContext);
-        private static GenericRepository<Order> orderRepo = new GenericRepository<Order>(dbContext);
-        private static GenericRepository<SubOrder> subOrderRepo = new GenericRepository<SubOrder>(dbContext);
+        public OrderItemRepository()
+        {
+            ApplicationDbContext dbContext = new ApplicationDbContext();
 
-        public static List<int> CreateOrderItems(List<DTOOrderItem> orderItems, int orderId)
+            orderItemRepo = new GenericRepository<OrderItem>(dbContext);
+            itemRepo = new GenericRepository<Item>(dbContext);
+            vendorRepo = new GenericRepository<Vendor>(dbContext);
+            catalogRepo = new GenericRepository<Catalog>(dbContext);
+            orderRepo = new GenericRepository<Order>(dbContext);
+            subOrderRepo = new GenericRepository<SubOrder>(dbContext);
+        }
+
+        public List<int> CreateOrderItems(List<DTOOrderItem> orderItems, int orderId)
         {
             var data = (from oi in orderItems
                         join i in itemRepo.Get(null, null, "") on oi.ItemId equals i.Id

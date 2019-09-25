@@ -9,15 +9,24 @@ namespace Web3.DL
 {
     public class SubOrderRepository
     {
-        private static ApplicationDbContext dbContext = new ApplicationDbContext();
+        private GenericRepository<SubOrder> subOrderRepo;
+        private GenericRepository<Models.Order> orderRepo;
+        private GenericRepository<Item> itemRepo;
+        private GenericRepository<Catalog> catalogRepo;
+        private GenericRepository<Vendor> vendorRepo;
 
-        private static GenericRepository<SubOrder> subOrderRepo = new GenericRepository<SubOrder>(dbContext);
-        private static GenericRepository<Models.Order> orderRepo = new GenericRepository<Models.Order>(dbContext);
-        private static GenericRepository<Item> itemRepo = new GenericRepository<Item>(dbContext);
-        private static GenericRepository<Catalog> catalogRepo = new GenericRepository<Catalog>(dbContext);
-        private static GenericRepository<Vendor> vendorRepo = new GenericRepository<Vendor>(dbContext);
+        public SubOrderRepository()
+        {
+            ApplicationDbContext dbContext = new ApplicationDbContext();
 
-        public static List<int> Create(List<DTOOrderItem> orderItems, int orderId)
+            subOrderRepo = new GenericRepository<SubOrder>(new ApplicationDbContext());
+            orderRepo = new GenericRepository<Models.Order>(new ApplicationDbContext());
+            itemRepo = new GenericRepository<Item>(new ApplicationDbContext());
+            catalogRepo = new GenericRepository<Catalog>(new ApplicationDbContext());
+            vendorRepo = new GenericRepository<Vendor>(new ApplicationDbContext());
+        }
+
+        public List<int> Create(List<DTOOrderItem> orderItems, int orderId)
         {
             var data = (from oi in orderItems
                         join i in itemRepo.Get(null, null, "") on oi.ItemId equals i.Id
@@ -57,7 +66,7 @@ namespace Web3.DL
             return subOrderIds;                       
         }
 
-        public static DataResult<SubOrder> GetData(DataTableFilter dtFilter, int? orderId)
+        public DataResult<SubOrder> GetData(DataTableFilter dtFilter, int? orderId)
         {
             DataResult<SubOrder> dataResult = new DataResult<SubOrder>();
 

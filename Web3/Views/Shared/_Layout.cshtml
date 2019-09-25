@@ -12,6 +12,7 @@
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/datatable")
+    @Scripts.Render("~/bundles/highcharts")
 
 </head>
 <body>
@@ -29,6 +30,7 @@
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Catalogs", "Index", "Catalog")</li>
                     <li>@Html.ActionLink("Orders", "Index", "Order")</li>
+                    <li>@Html.ActionLink("Analytics", "Index", "Analytics")</li>
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>

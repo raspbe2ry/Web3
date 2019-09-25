@@ -22,7 +22,7 @@ namespace Web3.Controllers
 
         public JsonResult GetVendorSelectList(string searchTerm, int pageSize, int pageNumber)
         {
-            var result = VendorRepository.GetData(searchTerm, pageSize, pageNumber);
+            var result = new VendorRepository().GetData(searchTerm, pageSize, pageNumber);
 
             return Json(result, JsonRequestBehavior.AllowGet);
         }

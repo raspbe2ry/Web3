@@ -1,0 +1,79 @@
+﻿<br />
+
+<div class="panel panel-default">
+    <div class="panel-heading" data-toggle="collapse" data-target="#bottomPartMonFil">
+        <h4>
+            Filters
+        </h4>
+    </div>
+
+    <div id="bottomPartMonFil" class="collapse">
+        <div class="panel-body">
+        </div>
+    </div>
+</div>
+
+<div class="panel-default">
+    <div class="panel-heading" data-toggle="collapse" data-target="#bottomPartMon">
+        <h4>Monthly Costs</h4>
+    </div>
+
+    <div id="bottomPartMon" class="collapse">
+        <div class="panel-body">
+            <div id="monthlytChart">
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+    var costChart;
+    var year = 2019;
+
+    function requestData() {
+        $.ajax({
+            url: '@Url.Action("GetMonthlyCosts","Analytics")',
+            type: "POST",
+            data: {year},
+            success: function (result) {
+                debugger;
+                for (var i = 0; i < result.data.Series.length; i++) {
+                    costChart.addSeries({
+                        name: result.data.Series[i].Name, 
+                        data: result.data.Series[i].Data
+                    }, false);
+                }
+                costChart.redraw();
+            },
+            cache: false
+        });
+    };
+
+    $(document).ready(function () {
+        costChart = Highcharts.chart('monthlytChart', {
+            chart: {
+                type: 'line',
+                events: {
+                    load: requestData
+                }
+            },
+            title: {
+                text: 'Monthly Costs'
+            },
+            subtitle: {
+                text: ''
+            },
+            xAxis: {
+                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            },
+            yAxis: {
+                title: {
+                    text: 'Cost ($)'
+                }
+            },
+            series: []
+        });
+    });
+</script>

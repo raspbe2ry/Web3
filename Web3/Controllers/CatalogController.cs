@@ -19,7 +19,7 @@ namespace Web3.Controllers
 
         public JsonResult GetCatalogData(DataTableFilter dtFilter, CatalogFilter filter)
         {
-            var data = DTOCatalog.MapToDTO(CatalogRepository.GetData(dtFilter, filter));
+            var data = DTOCatalog.MapToDTO(new CatalogRepository().GetData(dtFilter, filter));
 
             return Json(new {
                 recordsTotal = data.Count,
@@ -30,7 +30,7 @@ namespace Web3.Controllers
 
         public JsonResult GetCatalog(int id)
         {
-            var data = DTOCatalog.MapToDTO(CatalogRepository.GetIndividual(id));
+            var data = DTOCatalog.MapToDTO(new CatalogRepository().GetIndividual(id));
 
             return Json(data);
         }

@@ -11,9 +11,9 @@ namespace Web3.DL
 {
     public class CatalogRepository
     {
-        private static GenericRepository<Catalog> repo = new GenericRepository<Catalog>(new ApplicationDbContext());
+        private GenericRepository<Catalog> repo = new GenericRepository<Catalog>(new ApplicationDbContext());
 
-        public static DataResult<Catalog> GetData(DataTableFilter dtFilter, CatalogFilter filter)
+        public DataResult<Catalog> GetData(DataTableFilter dtFilter, CatalogFilter filter)
         {
             DataResult<Catalog> dataResult = new DataResult<Catalog>();
 
@@ -49,7 +49,7 @@ namespace Web3.DL
             return dataResult;
         }
 
-        public static Catalog GetIndividual(int id)
+        public Catalog GetIndividual(int id)
         {
             Catalog individual = repo.GetByID(id);
 

@@ -10,12 +10,10 @@ namespace Web3.DL
 {
     public class OrderRepository
     {
-        private static ApplicationDbContext dbContext = new ApplicationDbContext();
+        private GenericRepository<SubOrder> subOrderRepo = new GenericRepository<SubOrder>(new ApplicationDbContext());
+        private GenericRepository<Models.Order> orderRepo = new GenericRepository<Models.Order>(new ApplicationDbContext());
 
-        private static GenericRepository<SubOrder> subOrderRepo = new GenericRepository<SubOrder>(dbContext);
-        private static GenericRepository<Models.Order> orderRepo = new GenericRepository<Models.Order>(dbContext);
-
-        public static DataResult<Models.Order> GetData(DataTableFilter dtFilter, OrderFilter filter)
+        public DataResult<Models.Order> GetData(DataTableFilter dtFilter, OrderFilter filter)
         {
             DataResult<Models.Order> dataResult = new DataResult<Models.Order>();
 
@@ -51,7 +49,7 @@ namespace Web3.DL
             return dataResult;
         }
 
-        public static int CreateOrder()
+        public int CreateOrder()
         {
             Models.Order order = new Models.Order()
             {

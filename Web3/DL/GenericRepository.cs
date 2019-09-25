@@ -80,6 +80,7 @@ namespace Web3.DL
         {
             dbSet.Attach(entityToUpdate);
             context.Entry(entityToUpdate).State = EntityState.Modified;
+            context.SaveChanges();
         }
 
         public virtual void Save()

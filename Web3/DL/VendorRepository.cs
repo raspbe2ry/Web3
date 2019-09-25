@@ -9,9 +9,9 @@ namespace Web3.DL
 {
     public class VendorRepository
     {
-        private static GenericRepository<Vendor> repo = new GenericRepository<Vendor>(new ApplicationDbContext());
+        private GenericRepository<Vendor> repo = new GenericRepository<Vendor>(new ApplicationDbContext());
 
-        public static Select2PagedResult GetData(string searchTerm, int pageSize, int pageNumber)
+        public Select2PagedResult GetData(string searchTerm, int pageSize, int pageNumber)
         {
             Select2PagedResult dataResult = new Select2PagedResult();
 
