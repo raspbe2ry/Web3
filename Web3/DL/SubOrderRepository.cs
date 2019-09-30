@@ -4,6 +4,7 @@ using Web3.DTO;
 using Web3.Helpers;
 using Web3.Models;
 using System.Linq.Dynamic;
+using System;
 
 namespace Web3.DL
 {
@@ -52,7 +53,8 @@ namespace Web3.DL
                 {
                     OrderId = orderId,
                     VendorId = so.VendorId, 
-                    Price = so.SubOrderPrice
+                    Price = so.SubOrderPrice, 
+                    ExpectedShipmentDate = DateTime.Now.AddDays(7)
                 };
 
                 subOrderIds.Add(subOrderRepo.Insert(subOrder));

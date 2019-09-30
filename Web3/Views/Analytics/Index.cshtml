@@ -9,6 +9,39 @@
 
     <div id="bottomPartMonFil" class="collapse">
         <div class="panel-body">
+
+            <div class="row">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-1">
+                    <label>Period</label>
+                </div>
+                <div class="col-sm-4">
+                    <select class="form-control periodFilter" name="period" style="width: 250px">
+                        <option value="year">Year</option>
+                        <option value="month">Month</option>
+                    </select>
+                </div>
+
+                <div class='col-sm-2'>
+                    <label>Begining Date To:</label>
+                </div>
+
+                <div class='col-sm-3'>
+                    <div class="form-group">
+                        <div class='input-group date' id='filterDate'>
+                            <input type='text' class="form-control" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <button class="applyFilterBtn btn btn-secondary pull-right" style="margin-right: 50px;">Apply</button>
+            </div>
+
         </div>
     </div>
 </div>
@@ -18,7 +51,7 @@
         <h4>Monthly Costs</h4>
     </div>
 
-    <div id="bottomPartMon" class="collapse">
+    <div id="bottomPartMon" class="collapse show">
         <div class="panel-body">
             <div id="monthlytChart">
             </div>
@@ -31,14 +64,28 @@
 <script>
     var costChart;
     var year = 2019;
+    var month = 10;
+    var period = "year";
 
     function requestData() {
+        $('#bottomPartMon').block({ message: "Loading chart..." });
+        debugger;
+        period = $('.periodFilter').val();
+        var dateFromFilter = new Date($('#filterDate').find("input").val());
+        filterDate = dateFromFilter != 'Invalid Date' ? dateFromFilter.toISOString() : null;
+
         $.ajax({
             url: '@Url.Action("GetMonthlyCosts","Analytics")',
             type: "POST",
-            data: {year},
+            data: { filterDate, period},
             success: function (result) {
                 debugger;
+                var seriesLength = costChart.series.length;
+                for (var i = seriesLength - 1; i > -1; i--) {
+                    costChart.series[i].remove();
+                }
+                costChart.xAxis[0].setCategories(result.cat);
+
                 for (var i = 0; i < result.data.Series.length; i++) {
                     costChart.addSeries({
                         name: result.data.Series[i].Name, 
@@ -46,12 +93,25 @@
                     }, false);
                 }
                 costChart.redraw();
+
+                $('#bottomPartMon').unblock();
             },
             cache: false
         });
     };
 
     $(document).ready(function () {
+        $('.periodFilter').select2();
+
+        $('#filterDate').datetimepicker({
+            locale: 'ru'
+        });
+
+        $('.applyFilterBtn').click(function () {
+            debugger;
+            requestData();
+        });
+
         costChart = Highcharts.chart('monthlytChart', {
             chart: {
                 type: 'line',
@@ -66,7 +126,7 @@
                 text: ''
             },
             xAxis: {
-                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                //categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
             },
             yAxis: {
                 title: {
